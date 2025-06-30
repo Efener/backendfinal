@@ -1,0 +1,159 @@
+.detail-page-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    position: sticky;
+    top: 2rem;
+}
+
+.detail-map-container {
+    height: 300px;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hotel-main-content, .rooms-container {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hotel-main-content h2 {
+    margin-top: 0;
+    font-size: 2.5rem;
+    color: #333;
+}
+
+.rooms-container h3 {
+    margin-top: 0;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.date-picker-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+}
+
+.date-picker-container input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.room-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    list-style-type: none;
+    padding: 0;
+}
+
+.room-item-detail {
+    border: 1px solid #eee;
+    padding: 1rem;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: box-shadow 0.2s;
+}
+
+.room-item-detail:hover {
+     box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.room-item-detail .info h4 {
+    margin: 0;
+}
+
+.room-item-detail .info p {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.book-now-btn {
+    background-color: #e42d4e;
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.book-now-btn:hover {
+    background-color: #c41d3d;
+}
+
+.comments-section {
+    margin-top: 2rem;
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+}
+
+.comments-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.comment-item {
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border-left: 4px solid #0071c2;
+}
+
+.comment-item p {
+    margin: 0 0 0.5rem 0;
+}
+
+.comment-item small {
+    color: #777;
+    font-style: italic;
+}
+
+.new-comment-form {
+    margin-top: 2rem;
+    border-top: 1px solid #eee;
+    padding-top: 2rem;
+}
+
+.new-comment-form textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    margin-bottom: 1rem;
+}
+
+.new-comment-form button {
+    padding: 0.8rem 1.5rem;
+    background-color: #0071c2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+} 
