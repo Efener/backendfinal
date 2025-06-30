@@ -1,35 +1,43 @@
 # render.yaml - Render Blueprint
+# Projenizin tüm altyapısını kod olarak tanımlar.
 # https://render.com/docs/blueprint-spec
 
+# Ortam değişkenlerini (secrets) saklamak için bir grup oluşturuyoruz.
+# Bu grubu Render arayüzünde oluşturup .env dosyanızdaki değerleri buraya gireceksiniz.
 envVarGroups:
   - name: hotel-secrets
     envVars:
       - key: POSTGRES_DB_URL
-        value: ""
+        value: "" # Render arayüzünde doldurulacak
       - key: MONGO_URL
-        value: ""
+        value: "" # Render arayüzünde doldurulacak
       - key: GEMINI_API_KEY
-        value: ""
+        value: "" # Render arayüzünde doldurulacak
       - key: REACT_APP_GOOGLE_MAPS_API_KEY
-        value: ""
+        value: "" # Render arayüzünde doldurulacak
       - key: JWT_SECRET
-        value: ""
+        value: "" # Render arayüzünde doldurulacak
       - key: GEMINI_API_URL
         value: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
-      - key: NODE_OPTIONS
+      - key: NODE_OPTIONS # hotel-comments-service için
         value: "--tls-min-v1.2"
 
 services:
+  # 1. BAĞIMLILIKLAR (Dependencies)
+  #--------------------------------
   - name: redis
     type: redis
-    plan: free
+    plan: free # Başlangıç için ücretsiz plan yeterlidir.
 
   - name: rabbitmq
-    type: pserv
-    plan: starter
+    type: pserv # Private Service (Dışarıya kapalı servis)
+    plan: starter # Ücretsiz plan RabbitMQ için yeterli olmayabilir.
     image:
-      url: rabbitmq:3.9-management-alpine
+      name: rabbitmq:3.9-management-alpine
 
+  # 2. ÖZEL SERVİSLER (Backend Microservices)
+  # Bunlar halka açık olmayacak, sadece API Gateway üzerinden erişilecek.
+  #-----------------------------------------------------------------
   - name: hotel-admin-service
     type: pserv
     env: docker
@@ -49,7 +57,7 @@ services:
         fromService:
           type: redis
           name: redis
-          property: connectionString
+          property: connectionString # Render, Redis URL'sini otomatik sağlar.
 
   - name: hotel-booking-service
     type: pserv
@@ -58,7 +66,7 @@ services:
     dockerContext: .
     envVars:
       - fromGroup: hotel-secrets
-      - key: RABBITMQ_URL
+      - key: RABBITMQ_URL # RabbitMQ servisine iç ağdan bağlanıyoruz.
         value: amqp://rabbitmq:5672
 
   - name: hotel-comments-service
@@ -87,22 +95,27 @@ services:
     envVars:
       - fromGroup: hotel-secrets
 
+  # 3. GENEL WEB SERVİSLERİ (Publicly Accessible)
+  #------------------------------------------------
   - name: api-gateway
-    type: web
+    type: web # Web Service (Dışarıya açık servis)
     env: docker
     plan: starter
     dockerfilePath: ./api-gateway/Dockerfile
     dockerContext: .
-    healthCheckPath: /
+    healthCheckPath: / # Basit bir sağlık kontrolü, gerekirse değiştirilebilir.
+    # API Gateway diğer servislere yukarıda tanımlanan adlarla erişir.
 
   - name: frontend
     type: web
     plan: starter
     env: docker
     dockerfilePath: ./frontend/Dockerfile
-    dockerContext: .
+    dockerContext: . # Dockerfile'ın bulunduğu dizin
+    dockerBuildArgs:
+      # Build sırasında kullanılacak ortam değişkeni
+      REACT_APP_GOOGLE_MAPS_API_KEY: ${REACT_APP_GOOGLE_MAPS_API_KEY}
     envVars:
-      - fromGroup: hotel-secrets
+      # Yukarıdaki build argümanını doldurmak için
       - key: REACT_APP_GOOGLE_MAPS_API_KEY
-    args:
-      REACT_APP_GOOGLE_MAPS_API_KEY: ${REACT_APP_GOOGLE_MAPS_API_KEY} 
+        fromGroup: hotel-secrets 
