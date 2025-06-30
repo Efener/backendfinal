@@ -33,7 +33,7 @@ services:
     type: pserv # Private Service (Dışarıya kapalı servis)
     plan: starter # Ücretsiz plan RabbitMQ için yeterli olmayabilir.
     image:
-      name: rabbitmq:3.9-management-alpine
+      url: rabbitmq:3.9-management-alpine
 
   # 2. ÖZEL SERVİSLER (Backend Microservices)
   # Bunlar halka açık olmayacak, sadece API Gateway üzerinden erişilecek.
@@ -41,16 +41,18 @@ services:
   - name: hotel-admin-service
     type: pserv
     env: docker
-    dockerfilePath: ./services/hotel-admin-service/Dockerfile
-    dockerContext: .
+    dockerBuild:
+      context: ./services/hotel-admin-service
+      dockerfilePath: Dockerfile
     envVars:
       - fromGroup: hotel-secrets
 
   - name: hotel-search-service
     type: pserv
     env: docker
-    dockerfilePath: ./services/hotel-search-service/Dockerfile
-    dockerContext: .
+    dockerBuild:
+      context: ./services/hotel-search-service
+      dockerfilePath: Dockerfile
     envVars:
       - fromGroup: hotel-secrets
       - key: REDIS_URL
@@ -62,8 +64,9 @@ services:
   - name: hotel-booking-service
     type: pserv
     env: docker
-    dockerfilePath: ./services/hotel-booking-service/Dockerfile
-    dockerContext: .
+    dockerBuild:
+      context: ./services/hotel-booking-service
+      dockerfilePath: Dockerfile
     envVars:
       - fromGroup: hotel-secrets
       - key: RABBITMQ_URL # RabbitMQ servisine iç ağdan bağlanıyoruz.
@@ -72,16 +75,18 @@ services:
   - name: hotel-comments-service
     type: pserv
     env: docker
-    dockerfilePath: ./services/hotel-comments-service/Dockerfile
-    dockerContext: .
+    dockerBuild:
+      context: ./services/hotel-comments-service
+      dockerfilePath: Dockerfile
     envVars:
       - fromGroup: hotel-secrets
 
   - name: notification-service
     type: pserv
     env: docker
-    dockerfilePath: ./services/notification-service/Dockerfile
-    dockerContext: .
+    dockerBuild:
+      context: ./services/notification-service
+      dockerfilePath: Dockerfile
     envVars:
       - fromGroup: hotel-secrets
       - key: RABBITMQ_URL
@@ -90,8 +95,9 @@ services:
   - name: ai-agent-service
     type: pserv
     env: docker
-    dockerfilePath: ./services/ai-agent-service/Dockerfile
-    dockerContext: .
+    dockerBuild:
+      context: ./services/ai-agent-service
+      dockerfilePath: Dockerfile
     envVars:
       - fromGroup: hotel-secrets
 
@@ -101,8 +107,9 @@ services:
     type: web # Web Service (Dışarıya açık servis)
     env: docker
     plan: starter
-    dockerfilePath: ./api-gateway/Dockerfile
-    dockerContext: .
+    dockerBuild:
+      context: ./api-gateway
+      dockerfilePath: Dockerfile
     healthCheckPath: / # Basit bir sağlık kontrolü, gerekirse değiştirilebilir.
     # API Gateway diğer servislere yukarıda tanımlanan adlarla erişir.
 
@@ -110,12 +117,10 @@ services:
     type: web
     plan: starter
     env: docker
-    dockerfilePath: ./frontend/Dockerfile
-    dockerContext: . # Dockerfile'ın bulunduğu dizin
-    dockerBuildArgs:
-      # Build sırasında kullanılacak ortam değişkeni
-      REACT_APP_GOOGLE_MAPS_API_KEY: ${REACT_APP_GOOGLE_MAPS_API_KEY}
+    dockerBuild:
+      context: ./frontend
+      dockerfilePath: Dockerfile
+      args:
+        REACT_APP_GOOGLE_MAPS_API_KEY: ${REACT_APP_GOOGLE_MAPS_API_KEY}
     envVars:
-      # Yukarıdaki build argümanını doldurmak için
-      - key: REACT_APP_GOOGLE_MAPS_API_KEY
-        fromGroup: hotel-secrets 
+      - fromGroup: hotel-secrets 
