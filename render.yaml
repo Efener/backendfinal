@@ -19,12 +19,14 @@ envVarGroups:
         value: "--tls-min-v1.2"
 
 services:
-  # --- Redis (Ready-to-use by Render) ---
+  # 1. Redis (Public IP allow list eklenmiş)
   - name: redis
     type: redis
     plan: free
+    ipAllowList:
+      - source: 0.0.0.0/0
 
-  # --- RabbitMQ (Özelleştirilmiş Dockerfile ile) ---
+  # 2. RabbitMQ (Özelleştirilmiş Dockerfile ile çalıştırılacak)
   - name: rabbitmq
     type: pserv
     env: docker
@@ -32,7 +34,7 @@ services:
     dockerfilePath: ./services/rabbitmq/Dockerfile
     dockerContext: .
 
-  # --- Backend Servisleri ---
+  # 3. Backend Microservices
   - name: hotel-admin-service
     type: pserv
     env: docker
@@ -90,7 +92,7 @@ services:
     envVars:
       - fromGroup: hotel-secrets
 
-  # --- Public Web Servisleri ---
+  # 4. Public Web Services
   - name: api-gateway
     type: web
     env: docker
@@ -108,5 +110,4 @@ services:
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: .
     envVars:
-      - key: REACT_APP_GOOGLE_MAPS_API_KEY
-        fromGroup: hotel-secrets
+      - fromGroup: hotel-secrets
